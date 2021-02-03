@@ -59,9 +59,9 @@ class SetUp():
     stat_count : int
         the number of stats extracted for the Fantasy League
     stats_list : Array
-        a list of the extracted stats for the Fantasy League
+        a list of the extracted stats for the Fantasy League, contains stat name and stat type
     scoring_stats_list : Array
-        the list of the stats which are considered for the Fantasy League's scoring system
+        the list of the stats which are considered for the Fantasy League's scoring system, contains stat name and stat type
     league_teams_raw : YahooFantasyObject
         the extracted data for the league teams information
     teams_dict : dict
@@ -70,7 +70,7 @@ class SetUp():
         list of teams names for the Fantasy League
     manager_names
         list of manager names for the Fantasy League
-    game_weeks_raw : YahooFantasyObject
+    weeks_raw : YahooFantasyObject
         the extracted data for the league weeks information
     weeks : dict
         dictionary with the game weeks as keys and start and end date to each week
@@ -244,7 +244,7 @@ class SetUp():
         None
         """
         game_weeks = self.yahoo_query.get_game_weeks_by_game_id(self.game_id)
-        self.game_weeks_raw = game_weeks
+        self.weeks_raw = game_weeks
 
         self.weeks = {}
         self.num_weeks = 0

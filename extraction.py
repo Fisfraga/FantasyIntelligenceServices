@@ -2,7 +2,7 @@
 Use this module to import the Extract_Week_Data class.
 
 Please be sure that the following libraries installed in the python Source folder:
-json, datetime
+json, datetime, abc
 """
 
 __author__ = "Felipe P A Fraga (fisfraga)"
@@ -11,9 +11,9 @@ __email__ = "lipefraga@gmail.com"
 
 import json
 import datetime
+from abc import ABC, abstractmethod
 
-
-class Extract_Data():
+class Extract_Data(ABC):
     """Abstract class for extraction classes. Used to extract data from the Yahoo Fantasy API.
     Should be initiated using the SetUp object created for the Fantasy League.
 
@@ -168,10 +168,7 @@ class Extract_Week_Data(Extract_Data):
             weekly_stats[str(week)] = [None]*self.num_teams
             for team in range(1, int(self.num_teams + 1)):
                 team_stats = {}
-
                 present_team_stats = self.get_team_stats_by_week(team, week)
-                #present_team_stats = self.yahoo_query.get_team_stats_by_week(team, week)
-
                 team_stats["Team"] = str(self.teams[str(team)][0])
                 team_stats["Manager"] = str(self.teams[str(team)][1])
                 for stat_id in range(1, self.stat_count + 1):
@@ -245,117 +242,3 @@ class Extract_Week_Data(Extract_Data):
         return self.yahoo_query.query(
             "https://fantasysports.yahooapis.com/fantasy/v2/team/" + str(team_key) + "/stats;type=week;week=" +
             str(chosen_week), ["team"])
-
-#Retirar para envio
-
-
-class Extract_Player_Data(Extract_Data):
-
-    def __init__(self, game):
-        super().__init__(game)
-        #self.update_player_id_database()
-        self.extract_roster_past_data_headone()
-
-        pass
-
-    def update_player_id_database(self):
-        #check if relevant_player_ids json file exists
-            #load json file for relevant players
-        #else: initiate empty
-        self.data_dir_players = self.data_dir + "_league_player_ids_" + str(self.current_week) + ".txt"
-        self.relevant_players_ids = []
-        for week in range(1, self.current_week + 1):
-            for team_id in range(1, self.num_teams + 1):
-                team = self.get_team_roster_player_stats_by_week(team_id, week)
-                for player in team:
-                    player_id = player["player"].player_id
-                    if player_id not in self.relevant_players_ids:
-                        self.relevant_players_ids.append(player_id)
-        self.extracted_data = self.relevant_players_ids
-        self.save_to_json(self.data_dir_players)
-
-    #mudar para extract players data a partir dos player ids que tao no self.relevant_players_ids
-    def extract_roster_past_data_headone(self):
-
-        print("Importing season " + str(self.season) + " data from week 1 to", self.current_week, "\n")
-        self.data_dir_players = self.data_dir + "_league_teams_past_stats_week_" + str(self.current_week) + ".txt"
-        self.extracted_data = []
-        all_player_stats = []
-        periods = ["season", "lastmonth", "lastweek"]
-        for team_id in range(1, self.num_teams + 1):
-            print("Team: ", self.teams[str(team_id)][0], " ... Loading ...")
-            present_team_roster_stats = {}
-
-            for period in periods:
-                present_team_roster_stats = self.get_team_roster_player_stats(team_id, period)
-                for player in range(self.players_per_team):
-                    player_stats = []
-                    player_stats.append(team_id)
-                    player_stats.append(period)
-                    player_stats.append(present_team_roster_stats[player]['player'].editorial_team_abbr)
-                    player_stats.append(present_team_roster_stats[player]['player'].player_id)
-                    player_stats.append(present_team_roster_stats[player]['player'].name.full)
-                    for stat_id in range(self.stat_count):
-                        player_stats.append(present_team_roster_stats[player]['player'].stats[stat_id]['stat'].value)
-                    all_player_stats.append(player_stats)
-                    player_stats = []
-
-            print("\nLoaded!\n")
-        self.extracted_data = all_player_stats
-        self.save_to_json(self.data_dir_players)
-        print("Weekly stats saved to: ", self.data_dir_players)
-
-        pass
-
-    def get_league_standings(self, chosen_week):
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/league/" + self.league_key + "/standings;type=week;week=" +
-            str(chosen_week), ["league"])    
-
-    def get_team_roster_player_stats(self, team_id, period):
-        team_key = self.league_key + ".t." + str(team_id)
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/team/" + str(team_key) +
-            "/roster/players/stats;type=" + str(period),
-            ["team", "roster", "0", "players"])
-
-    def get_player_stats_by_date(self, player_id, date):
-
-        player_key = self.game_code + ".p." + str(player_id)
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/league/" + self.league_key + "/players;player_keys=" +
-            player_key + "/stats;type=date;date=" + date.strftime('%Y-%m-%d'), ["league", "players", "0", "player"])#, Player)
-
-    #Testar vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-    def get_team_stats_by_week(self, team_id, chosen_week="current"):
-        team_key = self.league_key + ".t." + str(team_id)
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/team/" + str(team_key) + "/stats;type=week;week=" +
-            str(chosen_week), ["team"])
-
-    def get_team_roster_player_stats_by_week(self, team_id, chosen_week="current"):
-        """Retrieve roster with ALL player info for the season of specific team by team_id and for chosen league.
-
-        """
-        team_key = self.league_key + ".t." + str(team_id)
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/team/" + str(team_key) +
-            "/roster/players/stats;type=week;week=" + str(chosen_week),
-            ["team", "roster", "0", "players"])
-
-    def get_league_players(self):
-        """Retrieve valid players for chosen league.
-                IS THERE A RANKING????
-        """
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/league/" + self.league_key + "/players",
-            ["league", "players"])
-
-    def get_player_stats_by_week(self, player_key, chosen_week="current"):
-        """Retrieve stats of specific player by player_key and by week for chosen league.
-              }
-        """
-        return self.yahoo_query.query(
-            "https://fantasysports.yahooapis.com/fantasy/v2/league/" + self.league_key + "/players;player_keys=" +
-            str(player_key) + "/stats;type=week;week=" + str(chosen_week), ["league", "players", "0", "player"], Player)

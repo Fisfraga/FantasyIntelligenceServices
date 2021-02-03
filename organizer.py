@@ -2,7 +2,7 @@
 Use this module to import the Teams_Weekly_Data_Organizer class.
 
 Please be sure that the following libraries installed in the python Source folder:
-json, pandas
+json, pandas, abc
 """
 
 __author__ = "Felipe P A Fraga (fisfraga)"
@@ -12,9 +12,10 @@ __email__ = "lipefraga@gmail.com"
 import json
 import pandas as pd
 import numpy as np
+from abc import ABC, abstractmethod
 
 
-class Data_Organizer():
+class Data_Organizer(ABC):
     """Abstract class for organizing the extracted data into pandas DataFrames.
     Should be initiated using the SetUp object created for the Fantasy League.
 
@@ -252,6 +253,7 @@ class Teams_Weekly_Data_Organizer(Data_Organizer):
         if data_present == False:
             print("The data will not be organized, please try again after extracting the data")
         else:
+            print("Organizing season " + str(self.season) + " data from week 1 to", self.current_week, "\n")
             first = True
             for week in range(1, len(self.raw_data.keys())+1):
                 week_data, week_score = self.organize_this_weeks_data(self.raw_data[str(week)])
@@ -264,6 +266,10 @@ class Teams_Weekly_Data_Organizer(Data_Organizer):
             self.update_indexes()
             self.save_data()
             self.save_score_data()
+            print("Data Organized for" + str(self.league_name) + "!\n")
+            print("Organized data saved to: ", self.save_data_dir)
+
+
 
     def create_dfs(self, week_data, week_score):
         """Creates the DataFrames for week data and week score if they do not exist
@@ -597,69 +603,3 @@ class Teams_Weekly_Data_Organizer(Data_Organizer):
             return 0
         else:
             return -1
-
-
-class Players_Data_Organizer(Data_Organizer):
-
-    def __init__(self, game):
-        super().__init__(game)
-        self.read_data_dir = game.data_output_dir + "extraction_league_teams_past_stats_week_" + str(self.current_week) + ".txt"
-        self.save_data_dir = game.data_output_dir + "data_league_teams_past_stats_week_" + str(self.current_week) + ".csv"
-        if self.league_scoring_type == "headone":
-            self.organize_player_data_headone()
-        else:
-            print("League type not supported")
-        pass
-
-    def organize_player_data_headone(self):
-        """Main method in this class, organizes the raw, extracted data into weekly stats and weekly score.
-        Automatically called when Teams_Weekly_Data_Organizer object is initialized.
-        Saves all the data in pre-determined directories for later use when generating visualizations
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        ----------
-        None
-        """
-        data_present = self.read_raw_data_json()
-        if data_present == False:
-            print("The data will not be organized, please try again after extracting the data")
-        else:
-            numpyArray = np.array(self.raw_data) 
-            self.final_data = pd.DataFrame(data = numpyArray, columns = None) 
-                
-            """    
-            for team in range(1, len(self.raw_data.keys())+1):
-                team_data = self.organize_this_team_data(self.raw_data[str(week)])
-                if first is True:
-                    first = False
-                    self.final_data = pd.DataFrame.from_dict(team_data)
-                else:
-                    temp_df = pd.DataFrame.from_dict(team_data)
-                    copy_all_data = self.final_data.copy()
-                    self.final_data = pd.concat([copy_all_data, temp_df])
-
-            self.update_indexes()
-            self.save_data()
-            self.save_score_data()
-            """
-
-    def create_dfs(self, week_data, week_score):
-        """Creates the DataFrames for week data and week score if they do not exist
-
-        Parameters
-        ----------
-        week_data : dict
-            the organized week data for the first week
-        week_score : dict
-            the organized week score for the first week
-
-        Returns
-        ----------
-        None
-        """
-        self.final_data = pd.DataFrame.from_dict(week_data)
-        self.score_data = pd.DataFrame.from_dict(week_score) 

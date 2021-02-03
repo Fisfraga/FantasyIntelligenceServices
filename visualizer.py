@@ -2,13 +2,13 @@
 Use this module to import the Visualize_Teams_Season_Data and Visualize_Teams_Week_Data classes.
 
 Please be sure that the following libraries installed in the python Source folder:
-pandas, numpy, os, matplotlib, seaborn, dataframe_image, IPython, bokeh
+abc, pandas, numpy, os, matplotlib, seaborn, dataframe_image, IPython, bokeh
 """
 
 __author__ = "Felipe P A Fraga (fisfraga)"
 __email__ = "lipefraga@gmail.com"
 
-
+from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 import os
@@ -21,14 +21,14 @@ from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.transform import dodge
 
 
-class Data_Visualization():
+class Data_Visualization(ABC):
     """
     Abstract class for the visualization of the organized data.
     Should be initiated using an Data_Organizer object
 
      Attributes
     ----------
-    data : DataFrame
+    data : pandas.core.frame.DataFrame
         the DataFrame containing the organized data for the Yahoo Fantasy League's results
     teams_names : Array
         list of teams names for the Fantasy League
@@ -82,7 +82,8 @@ class Data_Visualization():
             self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Visualizations_Output\\", organized_data.league_name)
             self.valid_input = True
             print("This class supports the following functionalities:")
-
+    
+    @abstractmethod
     def save_visualization(self):
         """Abstract method that saves the active visualization to the save_dir
 
@@ -95,7 +96,8 @@ class Data_Visualization():
         None
         """
         pass
-
+    
+    @abstractmethod
     def generate_all_visualizations(self):
         """Abstract method that will generates all the non-team-specific visualizations for the Data_Visualization object
 
@@ -257,12 +259,12 @@ class Visualize_Teams_Week_Data(Data_Visualization):
 
     Attributes
     ----------
-    score_data : DataFrame
-        the DataFrame containing the organized data for the Yahoo Fantasy League's score
     week : int
         the active week for generating visualizations
     last_week : int
         the last week available for visualizations
+    score_data : pandas.core.frame.DataFrame
+        the DataFrame containing the organized data for the Yahoo Fantasy League's score
     week_table_data : pandas.core.frame.DataFrame
         present week's data as a pandas DataFrame object
     display_week_table : pandas.io.formats.style.Styler
