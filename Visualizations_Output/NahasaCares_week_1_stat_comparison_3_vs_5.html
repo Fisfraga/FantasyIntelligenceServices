@@ -1,0 +1,85 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Bokeh Plot</title>
+      
+      
+        
+          
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.2.3.min.js" integrity="sha384-T2yuo9Oe71Cz/I4X9Ac5+gpEa5a8PpJCDlqKYO0CfAuEszu1JrXLl8YugMqYe3sM" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="ccf7c0de-1e2b-4b04-979c-2193965a2ea0" data-root-id="1510"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="1612">
+          {"e2f01313-43b8-46d1-8152-57aee4d50feb":{"roots":{"references":[{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#a9a9b3"},"line_alpha":{"value":0.1},"line_color":{"value":"#a9a9b3"},"top":{"field":"opp"},"width":{"value":0.33},"x":{"field":"stats","transform":{"id":"1536"}}},"id":"1539","type":"VBar"},{"attributes":{"formatter":{"id":"1543"},"ticker":{"id":"1525"}},"id":"1524","type":"LinearAxis"},{"attributes":{"range":{"id":"1513"},"value":0.2},"id":"1536","type":"Dodge"},{"attributes":{},"id":"1522","type":"CategoricalTicker"},{"attributes":{"text":"Stat Comparison - Week 1 - Matchup: Chino Hills vs Jimmy's Team"},"id":"1511","type":"Title"},{"attributes":{"formatter":{"id":"1545"},"ticker":{"id":"1522"}},"id":"1521","type":"CategoricalAxis"},{"attributes":{},"id":"1519","type":"LinearScale"},{"attributes":{},"id":"1543","type":"BasicTickFormatter"},{"attributes":{"callback":null,"tooltips":[["Stat","@stats"],["You","@real_you"],["Opponent","@real_opp"]]},"id":"1509","type":"HoverTool"},{"attributes":{"axis":{"id":"1521"},"grid_line_color":null,"ticker":null},"id":"1523","type":"Grid"},{"attributes":{},"id":"1545","type":"CategoricalTickFormatter"},{"attributes":{"range":{"id":"1513"},"value":-0.2},"id":"1530","type":"Dodge"},{"attributes":{"data":{"colors":["00ab66","00ab66","00ab66","00ab66","e03531","e03531","00ab66","00ab66","e03531"],"opp":[0.9114037713259504,0.8749009396581002,0.6058047493403693,0.5960385244412139,0.7643768180801074,0.7444226101028782,0.8049832295160517,0.8148148148148148,1.3539227166276346],"real_opp":[0.435,0.69,40.99999999999999,410.0,183.0,115.0,30.0,22.0,-61.0],"real_you":[0.472,0.764,44.0,468.00000000000006,176.0,114.0,43.0,30.0,-77.0],"stats":["FG%","FT%","3PTM","PTS","REB","AST","ST","BLK","TO"],"you":[0.9889254714157438,0.9687308955054909,0.650131926121372,0.6803561693621661,0.7351383605579175,0.7379493700150271,1.1538092956396742,1.1111111111111112,1.0725881261595547]},"selected":{"id":"1547"},"selection_policy":{"id":"1548"}},"id":"1508","type":"ColumnDataSource"},{"attributes":{},"id":"1547","type":"Selection"},{"attributes":{"axis":{"id":"1524"},"dimension":1,"ticker":null},"id":"1527","type":"Grid"},{"attributes":{},"id":"1525","type":"BasicTicker"},{"attributes":{},"id":"1517","type":"CategoricalScale"},{"attributes":{"fill_color":{"field":"colors"},"line_color":{"field":"colors"},"top":{"field":"you"},"width":{"value":0.33},"x":{"field":"stats","transform":{"id":"1530"}}},"id":"1532","type":"VBar"},{"attributes":{"below":[{"id":"1521"}],"center":[{"id":"1523"},{"id":"1527"}],"left":[{"id":"1524"}],"plot_height":250,"renderers":[{"id":"1534"},{"id":"1540"}],"title":{"id":"1511"},"toolbar":{"id":"1528"},"toolbar_location":null,"x_range":{"id":"1513"},"x_scale":{"id":"1517"},"y_range":{"id":"1515"},"y_scale":{"id":"1519"}},"id":"1510","subtype":"Figure","type":"Plot"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"1509"}]},"id":"1528","type":"Toolbar"},{"attributes":{"source":{"id":"1508"}},"id":"1541","type":"CDSView"},{"attributes":{"data_source":{"id":"1508"},"glyph":{"id":"1538"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1539"},"selection_glyph":null,"view":{"id":"1541"}},"id":"1540","type":"GlyphRenderer"},{"attributes":{"source":{"id":"1508"}},"id":"1535","type":"CDSView"},{"attributes":{"end":2},"id":"1515","type":"Range1d"},{"attributes":{"factors":["FG%","FT%","3PTM","PTS","REB","AST","ST","BLK","TO"],"range_padding":0.1},"id":"1513","type":"FactorRange"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"field":"colors"},"line_alpha":{"value":0.1},"line_color":{"field":"colors"},"top":{"field":"you"},"width":{"value":0.33},"x":{"field":"stats","transform":{"id":"1530"}}},"id":"1533","type":"VBar"},{"attributes":{"fill_color":{"value":"#a9a9b3"},"line_color":{"value":"#a9a9b3"},"top":{"field":"opp"},"width":{"value":0.33},"x":{"field":"stats","transform":{"id":"1536"}}},"id":"1538","type":"VBar"},{"attributes":{"data_source":{"id":"1508"},"glyph":{"id":"1532"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1533"},"selection_glyph":null,"view":{"id":"1535"}},"id":"1534","type":"GlyphRenderer"},{"attributes":{},"id":"1548","type":"UnionRenderers"}],"root_ids":["1510"]},"title":"Bokeh Application","version":"2.2.3"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('1612').textContent;
+                  var render_items = [{"docid":"e2f01313-43b8-46d1-8152-57aee4d50feb","root_ids":["1510"],"roots":{"1510":"ccf7c0de-1e2b-4b04-979c-2193965a2ea0"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        clearInterval(timer);
+                        embed_document(root);
+                      } else {
+                        attempts++;
+                        if (attempts > 100) {
+                          clearInterval(timer);
+                          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        }
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>

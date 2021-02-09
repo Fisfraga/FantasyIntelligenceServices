@@ -13,6 +13,7 @@ from yahoo_oauth import OAuth2
 from yfpy_models import YahooFantasyObject, Game, User, League, Standings, Settings, Player, StatCategories, \
     Scoreboard, Team, TeamPoints, TeamStandings, Roster
 from yfpy_utils import reformat_json_list, unpack_data, complex_json_handler
+from yfpy_data import Data
 
 logger = logging.getLogger(__name__)
 # suppress yahoo-oauth debug logging

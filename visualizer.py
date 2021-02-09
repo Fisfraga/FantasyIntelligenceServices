@@ -22,11 +22,10 @@ from bokeh.transform import dodge
 
 
 class Data_Visualization(ABC):
-    """
-    Abstract class for the visualization of the organized data.
+    """Abstract class for the visualization of the organized data.
     Should be initiated using an Data_Organizer object
 
-     Attributes
+    Attributes
     ----------
     data : pandas.core.frame.DataFrame
         the DataFrame containing the organized data for the Yahoo Fantasy League's results
@@ -113,8 +112,7 @@ class Data_Visualization(ABC):
 
 
 class Visualize_Teams_Season_Data(Data_Visualization):
-    """
-    Subclass for the visualization of the organized data.
+    """Subclass for the visualization of the organized data.
     Should be initiated using an Teams_Weekly_Data_Organizer object
 
     Attributes

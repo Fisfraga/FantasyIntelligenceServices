@@ -78,6 +78,7 @@ numpy
 seaborn
 jinja2
 openpyxl
+sklearn
 
 The necessary installations to use the program are:
 
@@ -91,6 +92,7 @@ pip install matplotlib
 pip install ipython
 pip install bokeh
 pip install dataframe_image
+pip install sklearn
 
 
 
@@ -121,5 +123,8 @@ To initialize a Data_Organization class object, use the SetUp class object.
 
 To initialize a Data_Visualization class object, use the Data_Organization class object.
 
+To initialize a Data_Analyzer class object, use the Data_Organization class object.
 
-The output for the Fantasy Intelligence Services are saved on the directory you clone it to, in the Visualizations_Output folder.
+
+
+The output for the Fantasy Intelligence Services are saved on the directory you clone it to, in the Visualizations_Output and Analyzer_Output folders.

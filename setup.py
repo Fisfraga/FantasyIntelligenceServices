@@ -156,8 +156,13 @@ class SetUp():
         self.league_name = league_info.name #unicodedata.normalize("NFD", league_info.name).encode("ascii", "ignore").decode("utf-8")
         self.data_output_dir = self.data_output_dir + self.league_name + "_"
         self.current_week = int(league_info.current_week)
-        self.last_week = int(league_info.settings.playoff_start_week) - 1
-        if int(self.season) < 2019:
+
+        if int(self.season) <= 2019:
+            self.last_week = 19
+        else:
+            self.last_week = int(league_info.settings.playoff_start_week) - 1
+
+        if int(self.season) <= 2019:
             self.current_week = self.last_week
 
         self.num_teams = league_info.num_teams

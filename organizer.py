@@ -13,6 +13,7 @@ import json
 import pandas as pd
 import numpy as np
 from abc import ABC, abstractmethod
+from collections import ChainMap
 
 
 class Data_Organizer(ABC):
@@ -603,3 +604,268 @@ class Teams_Weekly_Data_Organizer(Data_Organizer):
             return 0
         else:
             return -1
+
+
+
+class Players_Data_Organizer(Data_Organizer):
+    """Subclass for extracting the data representing the results for the Fantasy League's players. Used to extract data from the Yahoo Fantasy API.
+    Automatically tries to extract the data when an object is created.
+
+    Attributes
+    ----------
+    active_players_list : Array
+        array with the ids for the players that will have their data extracted
+    X_columns : Array
+        the columns that are important for the pre_processing of the data
+    X_columns_advanced : Array
+        the columns that are important for the pre_processing of the data considering advanced stats
+    stats_to_take_average : Array
+        list of stats that are dependent on the number of games
+    num_stats : int
+        number of stats extracted for each player
+    stats_to_take_average_advanced : Array
+        list of stats that are dependent on the number of games, considering advanced stats
+    num_stats_advanced : int
+        number of stats extracted for each player, considering advanced stats
+    player_info : dict
+        dictionary with the descriptive information of the players, name, team, position
+    points_breakdown : dict
+        dictionary with the points made by each stat category for each player
+    avg_dfs : dict
+        dictionary with pandas DataFrames containing the average stats for each player in the season
+    X_dfs : dict
+        dictionary with pandas DataFrames containing the stats that will input the model
+    y_dfs : dict
+        dictionary with pandas DataFrames containing the points made by each player in a season
+    avg_dfs_advanced : dict
+        dictionary with pandas DataFrames containing the average stats for each player in the season
+    X_dfs_advanced : dict
+        dictionary with pandas DataFrames containing the stats that will input the model, considering advanced stats
+
+
+    Methods
+    -------
+    __init__()
+        initializes a Players_Data_Organizer object and organizes the data
+    read_raw_data_json(data_dir):
+        reads any .json file and returns the raw_data
+    organize_player_data():
+        main method in the class, organizes the raw, extracted data into the season data for each player
+    create_average_stats(raw_dict, stats_to_take_average):
+        receives the raw data and returns the average data for each player in the dict
+    pre_process_data(avg_dfs, X_columns):
+        filters the average data for the chosen columns for the model to predict the rankings next season
+    calculate_points(avg_stats_df):
+        using the average stats for the season, calculates the points used to rank the players, for each player
+    """
+
+    def __init__(self, setup, pre_process_stats=0):
+        """initializes a Players_Data_Organizer object and organizes the data
+
+        Parameters
+        ----------
+        setup : SetUp
+            the SetUp class object which holds all the necessary information to organize the data
+        pre_process_stats : Array
+            the list of columns that will be used for pre-processing the data
+        """
+        super().__init__(setup)
+        self.read_data_dir = setup.data_output_dir + "extraction_"
+        self.save_data_dir = setup.data_output_dir + "data_league_teams_past_stats_week_" + str(self.current_week) + ".csv"
+        self.active_players_list = self.read_raw_data_json(self.read_data_dir + "relevant_player_ids.txt")
+        self.active_players_list = list(set(self.active_players_list))
+        self.organize_player_data(pre_process_stats)
+        
+
+    def read_raw_data_json(self, data_dir):
+        """Reads the data present in a json file and returns the raw_data
+
+        Parameters
+        ----------
+        data_dir : str
+            directory to the .json file that will be read
+
+        Returns
+        ----------
+        raw_data : dict
+            the data read from the .json file
+        """
+        try:
+            with open(data_dir) as json_file:
+                raw_data = json.load(json_file)
+        except FileNotFoundError:
+            print("The extracted raw data was not found, please be sure that the data was extracted correctly")
+            return 0
+        else:
+            return raw_data
+
+    def organize_player_data(self, pre_process_stats):
+        """Main method in the class, organizes the raw, extracted data into the season data for each player.
+        Automatically called when Players_Data_Organizer object is initialized.
+        Saves all the data in pre-determined directories for later use when generating visualizations
+
+        Parameters
+        ----------
+        pre_process_stats : Array
+            list of the stats that will be considered to run the predictive model for player stats
+
+        Returns
+        ----------
+        None
+        """
+        if pre_process_stats == 0:
+            self.X_columns = [6, 8, 9, 11, 12, 14, 16, 18, 21, 22, 23, 24, 25, 26, 27, 32, 33]
+        else:
+            self.X_columns = pre_process_stats
+        
+        self.X_columns_advanced = self.X_columns.copy()
+        self.X_columns_advanced.extend([34, 35, 38, 41, 42, 44, 45, 49, 50])
+
+        self.stats_to_take_average = [8, 9, 10, 12, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27]
+        self.num_stats = 34
+
+        self.stats_to_take_average_advanced = [8, 9, 10, 12, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 34, 35, 42, 43]
+        self.num_stats_advanced = 51
+
+        self.player_info = {}
+        self.points_breakdown = {}
+
+        self.avg_dfs = {}
+        self.X_dfs = {}
+        self.y_dfs = {}
+
+        self.avg_dfs_advanced = {}
+        self.X_dfs_advanced = {}
+        
+
+        for season in range(2012, 2021):
+            self.season = season
+            self.points_breakdown[season] = {}
+            read_data_dict = self.read_data_dir + "players_dict_" + str(season) + ".txt"
+            data = self.read_raw_data_json(read_data_dict)
+            
+            for player_id in self.active_players_list:
+                if player_id not in list(data.keys()):
+                    data[player_id] = [0]*self.num_stats
+            avg = self.create_average_stats(data, self.stats_to_take_average)
+            self.avg_dfs[season] = pd.DataFrame.from_dict(avg, orient='index')
+            self.X_dfs[season] = self.pre_process_data(self.avg_dfs[season], self.X_columns)
+            self.y_dfs[season] = pd.DataFrame.from_dict(self.calculate_points(self.avg_dfs[season]), orient='index') 
+            
+            if season > 2016:
+                read_advanced_data_dict = self.read_data_dir + "players_dict_advanced_" + str(season) + ".txt"
+                advanced_data = self.read_raw_data_json(read_advanced_data_dict)
+
+                for player_id in self.active_players_list:
+                    if player_id not in list(advanced_data.keys()):
+                        advanced_data[player_id] = [0]*self.num_stats_advanced
+                advanced_avg = self.create_average_stats(advanced_data, self.stats_to_take_average_advanced)
+                self.avg_dfs_advanced[season] = pd.DataFrame.from_dict(advanced_avg, orient='index')
+                self.X_dfs_advanced[season] = self.pre_process_data(self.avg_dfs_advanced[season], self.X_columns_advanced)
+
+    def create_average_stats(self, raw_dict, stats_to_take_average):
+        """Receives the raw data and returns the average data for each player in the dict
+
+        Parameters
+        ----------
+        raw_dict : dict
+            dict with the raw data for every player
+        stats_to_take_average
+            list with the stats that are dependent on the number of games
+        
+        Returns
+        --------
+        data : dict
+            average_data for each player
+        """
+        data = raw_dict.copy()
+        for key in list(raw_dict.keys()):
+            for stat_position in stats_to_take_average:
+                if data[key][6] > 0:
+                    data[key][stat_position] = float(data[key][stat_position])/float((data[key][6]))
+        
+        return data
+
+
+    def pre_process_data(self, avg_df, X_columns):
+        """filters the average data for the chosen columns for the model to predict the rankings next season
+
+        Parameters
+        ----------
+        avg_dif : pandas.core.frame.DataFrame
+            DataFrame with all the stats for each player
+        X_columns : Array
+            list with the columns that are important for the pre_processing of the data
+        
+        Returns
+        -------
+        X_df : pandas.core.frame.DataFrame
+            DataFrame containing only the selected columns
+        """
+        return avg_df[X_columns].copy()
+
+
+    def calculate_points(self, avg_stats_df):
+        """
+
+        Parameters
+        ----------
+        avg_stats_df : pandas.core.frame.DataFrame
+            DataFrame with the stats for each player
+
+        Returns
+        --------
+        points_dict : dict
+            dictionary with the points for each player for the season
+        """
+        multiplier = {'FG%' : [8, 9], 'FT%' : [15, 10], '3PTM' : 6, 'PTS' : 0.8, \
+        'REB' : 1.8, 'AST' : 3, 'ST' : 13, 'BLK' : 9, 'TO' : -4}
+        points_dict = {}
+        player_info = {}
+
+        for index, row in avg_stats_df.iterrows():
+            player_stats = row
+            player_id = index
+            points = 0
+            points_list = [self.season, player_stats[2]]
+            #FG%
+            if player_stats[11] > 0.46:
+                pos = 0
+            else:
+                pos = 1
+            if player_stats[9] > 0:
+                points_list.append((player_stats[10]/player_stats[9] - 0.46) * player_stats[9] * multiplier['FG%'][pos])
+            else:
+                points_list.append(0)
+            #FT%
+            if player_stats[14] > 0.78:
+                pos = 0
+            else:
+                pos = 1
+            if player_stats[12] > 0:
+                points_list.append((player_stats[13]/player_stats[12] - 0.78) * player_stats[12] * multiplier['FT%'][pos])
+            else:
+                points_list.append(0)
+            #3PTM
+            points_list.append(player_stats[16] * multiplier['3PTM'])
+            #PTS
+            points_list.append(player_stats[18] * multiplier['PTS'])
+            #REB
+            points_list.append(player_stats[21] * multiplier['REB'])
+            #AST
+            points_list.append(player_stats[22] * multiplier['AST'])
+            #ST
+            points_list.append(player_stats[23] * multiplier['ST'])
+            #BLK
+            points_list.append(player_stats[24] * multiplier['BLK'])
+            #TO
+            points_list.append(player_stats[25] * multiplier['TO'])
+            #Total
+            points_list.append(sum(points_list[2:11]))
+            points_dict[player_id] = points_list[11]
+            self.points_breakdown[self.season][player_id] = points_list
+            player_info[player_id] = [player_stats[2], player_stats[5], player_stats[4]]
+        
+        self.player_info[self.season] = player_info
+
+        return points_dict

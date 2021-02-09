@@ -7,7 +7,6 @@ import logging
 import stringcase
 
 from yfpy_utils import complex_json_handler
-# from yfpy_utils import flatten_to_objects
 
 logger = logging.getLogger(__name__)
 
